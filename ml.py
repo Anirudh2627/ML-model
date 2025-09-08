@@ -12,7 +12,7 @@ from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
     roc_auc_score, roc_curve, confusion_matrix
 )
-file_path = "451ee8f7-085b-4dc0-b7db-6de151289cbb.csv"  # update path if needed
+file_path = "451ee8f7-085b-4dc0-b7db-6de151289cbb.csv"  
 raw = pd.read_csv(file_path, skiprows=1)
 raw.columns = ["index", "id", "age", "salary", "bought_TV"]
 
@@ -28,7 +28,7 @@ df["bought_TV"] = pd.to_numeric(df["bought_TV"], errors="coerce").astype("Int64"
 df = df.dropna().reset_index(drop=True)
 df["bought_TV"] = df["bought_TV"].astype(int)
 
-# Remove invalid values (negative or zero)
+
 df = df[(df["age"] > 0) & (df["salary"] > 0)]
 print("After removing invalid values:", df.shape)
 
@@ -116,9 +116,7 @@ for name, model in best_models.items():
     cm = confusion_matrix(y_test, model.predict(X_test))
     print(f"\nConfusion Matrix - {name}:\n", cm)
 
-# ===============================
-# 7) ROC Curves
-# ===============================
+
 plt.figure()
 for name, (fpr, tpr) in roc_curves.items():
     plt.plot(fpr, tpr, label=name)
@@ -129,9 +127,7 @@ plt.ylabel("True Positive Rate")
 plt.legend()
 plt.show()
 
-# ===============================
-# 8) Feature Importance
-# ===============================
+
 # Logistic Regression
 lr = best_models["LogisticRegression"].named_steps["clf"]
 print("\nLogistic Regression Coefficients:")
@@ -144,4 +140,5 @@ for name in ["DecisionTree", "RandomForest"]:
     print(f"\n{name} Feature Importances:")
     for feat, imp in zip(["age", "salary"], model.feature_importances_):
         print(f"{feat}: {imp:.4f}")
+
 
