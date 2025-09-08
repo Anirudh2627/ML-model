@@ -1,7 +1,3 @@
-# ===============================================
-# Predicting TV Purchase - Full Final Pipeline
-# ===============================================
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,23 +12,19 @@ from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
     roc_auc_score, roc_curve, confusion_matrix
 )
-
-# ===============================
-# 1) Load & Clean Data
-# ===============================
 file_path = "451ee8f7-085b-4dc0-b7db-6de151289cbb.csv"  # update path if needed
 raw = pd.read_csv(file_path, skiprows=1)
 raw.columns = ["index", "id", "age", "salary", "bought_TV"]
 
-# Drop unnecessary cols
+
 df = raw.drop(columns=["index", "id"]).copy()
 
-# Convert datatypes
+
 df["age"] = pd.to_numeric(df["age"], errors="coerce")
 df["salary"] = pd.to_numeric(df["salary"], errors="coerce")
 df["bought_TV"] = pd.to_numeric(df["bought_TV"], errors="coerce").astype("Int64")
 
-# Drop missing values
+
 df = df.dropna().reset_index(drop=True)
 df["bought_TV"] = df["bought_TV"].astype(int)
 
@@ -40,9 +32,7 @@ df["bought_TV"] = df["bought_TV"].astype(int)
 df = df[(df["age"] > 0) & (df["salary"] > 0)]
 print("After removing invalid values:", df.shape)
 
-# ===============================
-# 2) Outlier Removal (IQR method)
-# ===============================
+
 def remove_outliers(df, col):
     Q1 = df[col].quantile(0.25)
     Q3 = df[col].quantile(0.75)
@@ -55,9 +45,6 @@ df = remove_outliers(df, "age")
 df = remove_outliers(df, "salary")
 print("After outlier removal:", df.shape)
 
-# ===============================
-# 3) Train/Test Split
-# ===============================
 X = df[["age", "salary"]].values
 y = df["bought_TV"].values
 
@@ -65,9 +52,6 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=42, stratify=y
 )
 
-# ===============================
-# 4) Models + Hyperparameters
-# ===============================
 param_grids = {
     "LogisticRegression": {
         "clf__C": [0.01, 0.1, 1, 10],
@@ -96,9 +80,7 @@ models = {
     "RandomForest": RandomForestClassifier(random_state=42)
 }
 
-# ===============================
-# 5) Hyperparameter Tuning (GridSearchCV)
-# ===============================
+
 best_models = {}
 for name, model in models.items():
     print(f"\n🔍 Tuning {name}...")
@@ -107,9 +89,7 @@ for name, model in models.items():
     best_models[name] = grid.best_estimator_
     print("Best Params:", grid.best_params_)
 
-# ===============================
-# 6) Evaluate Best Models
-# ===============================
+
 metrics_rows = {}
 roc_curves = {}
 
@@ -129,7 +109,7 @@ for name, model in best_models.items():
     roc_curves[name] = (fpr, tpr)
 
 metrics_df = pd.DataFrame(metrics_rows).T
-print("\n📊 Final Model Performance:\n", metrics_df)
+print("\n0Final Model Performance:\n", metrics_df)
 
 # Confusion Matrices
 for name, model in best_models.items():
@@ -164,3 +144,4 @@ for name in ["DecisionTree", "RandomForest"]:
     print(f"\n{name} Feature Importances:")
     for feat, imp in zip(["age", "salary"], model.feature_importances_):
         print(f"{feat}: {imp:.4f}")
+
